@@ -7,7 +7,6 @@ const Item = styled.li`
   border: 1px solid black;
   gap: 15px;
   width: 100%;
-  margin-left: -46%;
   border-radius: 5px;
   border: solid black 5px;
   padding-left: 8px;

@@ -205,7 +205,7 @@ class App extends Component {
               : (
                 <InputWrapper>
                   <Input
-                    placeholder="Уведіть завдання яке вам треба"
+                    placeholder="▣   Уведіть завдання яке вам треба"
                     value={this.state.inputValue}
                     onChange={this.handleInputChange}
                   />
