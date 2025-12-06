@@ -1,49 +1,39 @@
 import styled from "styled-components";
 import Skeleton from "react-loading-skeleton";
 const Item = styled.li`
-display: flex;
-align-items: center;
-box-shadow: rgba(0, 0, 0, 0.75) 5px 5px, rgba(0, 0, 0, 0.6) 10px 10px, rgba(0, 0, 0, 0.45) 15px 15px;
-border: 1px solid black;
-gap: 15px;
-width: 100%;
-border-radius: 5px;
-border: solid black 5px;
+  display: flex;
+  align-items: center;
+  box-shadow: rgba(0, 0, 0, 0.75) 5px 5px, rgba(0, 0, 0, 0.6) 10px 10px, rgba(0, 0, 0, 0.45) 15px 15px;
+  border: 1px solid black;
+  gap: 15px;
+  width: 100%;
+  margin-left: -46%;
+  border-radius: 5px;
+  border: solid black 5px;
+  padding-left: 8px;
 `;
 const Button = styled.button`
-padding: 5px 20px;
-background: red;
-&:hover { background: darkviolet; }
-color: white;
-font-size: 35px;
-margin-left: auto;
-cursor: pointer;
+  padding: 0px 15px;
+  background: red;
+  &:hover { background: darkviolet; }
+  color: white;
+  border: 5px solid red;
+  font-size: 35px;
+  margin-left: auto;
+  cursor: pointer;
 `;
 const ListType = styled.ul`
-display: flex;
-flex-direction: column;
-gap: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 98%;
 `;
-const ButtonPlus = styled.button`
-padding-top: 5px;
-padding-bottom: 5px;
-background: yellow;
-box-shadow: rgba(0, 0, 0, 0.75) 5px 5px, rgba(0, 0, 0, 0.6) 10px 10px, rgba(0, 0, 0, 0.45) 15px 15px;
-border: 5px solid black;
-width: 100%;
-border-radius: 5px;
-display: block;
-&:hover { background: skyblue; color: white; }
-color: red;
-cursor: pointer;
-font-size: 35px;
-`;
-export const List = ({ todos, onDelete, onToggle, onAdd, loading }) => {
+export const List = ({ todos, onDelete, onToggle, loading }) => {
   return (
     <ListType>
       {loading
         ? <Skeleton height={60} width="100%" />
-        : <ButtonPlus onClick={onAdd}>+</ButtonPlus>
+        : null
       }
       {todos.map(todo => (
         <Item key={todo.id}>
