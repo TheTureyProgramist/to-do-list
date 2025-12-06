@@ -9,7 +9,6 @@
     "react-dom": "^19.2.0",
     "react-loading-skeleton": "^3.5.0",
     "react-scripts": "5.0.1",
-    "start": "^5.1.0",
     "styled-components": "^6.1.19"
   },
   "scripts": {
