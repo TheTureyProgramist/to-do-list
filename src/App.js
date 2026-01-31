@@ -1,5 +1,5 @@
 import './App.css';
-import { Component } from 'react';
+import { Component, useMemo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -105,125 +105,117 @@ class Timer extends Component {
   }
 }
 
-class App extends Component {
-  state = {
-    todos: [
-      { id: 'id-1', text: 'Вивчити основи React', completed: true },
-      { id: 'id-2', text: 'Розібратися з React Router', completed: false },
-      { id: 'id-3', text: 'Пережити Redux', completed: false},
-      { id: 'id-4', text: 'Відсвяткувати по повній новий 2026рік', completed: false },
-      { id: 'id-5', text: 'Здолати 9клас', completed: false },
-      { id: 'id-6', text: 'Зробити щось нове', completed: false }  ],
-    filter: '',
-    inputValue: '',
-    hasError: false,
-    loading: true
-  };
+function App() {
+  const [todos, setTodos] = useState([
+    { id: 'id-1', text: 'Вивчити основи React', completed: true },
+    { id: 'id-2', text: 'Розібратися з React Router', completed: false },
+    { id: 'id-3', text: 'Пережити Redux', completed: false},
+    { id: 'id-4', text: 'Відсвяткувати по повній новий 2026рік', completed: false },
+    { id: 'id-5', text: 'Здолати 9клас', completed: false },
+    { id: 'id-6', text: 'Зробити щось нове', completed: false }
+  ]);
+  const [inputValue, setInputValue] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  componentDidMount() {
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('todos');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          this.setState({ todos: parsed });
+          setTodos(parsed);
         }
       }
     } catch (e) {
       console.error('Failed to load todos from localStorage:', e);
     } finally {
-      this.setState({ loading: false });
+      setLoading(false);
     }
-  }
+  }, []);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.todos !== this.state.todos) {
-      try {
-        localStorage.setItem('todos', JSON.stringify(this.state.todos));
-      } catch (e) {
-        console.error('Failed to save todos to localStorage:', e);
-      }
+  useEffect(() => {
+    try {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    } catch (e) {
+      console.error('Failed to save todos to localStorage:', e);
     }
-  }
+  }, [todos]);
 
-  componentDidCatch(error, info) {
-    console.error('Error caught in App (Error Boundary):', error, info);
-  }
-
-  handleInputChange = (e) => {
-    this.setState({ inputValue: e.target.value });
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
   };
 
-  addTodo = () => {
-    if (this.state.inputValue.trim() === '') return;
+  const addTodo = () => {
+    if (inputValue.trim() === '') return;
     const newTodo = {
       id: Date.now().toString(),
-      text: this.state.inputValue,
+      text: inputValue,
       completed: false
     };
-    this.setState(prev => {
-      const newTodos = [...prev.todos, newTodo];
-      return { todos: newTodos, inputValue: '' };
-    });
+    setTodos([...todos, newTodo]);
+    setInputValue('');
   };
 
-  deleteTodo = id => {
-    this.setState(prev => {
-      const newTodos = prev.todos.filter(todo => todo.id !== id);
-      return { todos: newTodos };
-    });
+  const deleteTodo = id => {
+    setTodos(todos.filter(todo => todo.id !== id));
   };
 
-  toggleTodo = id => {
-    this.setState(prev => {
-      const newTodos = prev.todos.map(todo =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      );
-      return { todos: newTodos };
-    });
+  const toggleTodo = id => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
   };
 
-  deleteAll = () => {
-    this.setState({ todos: [] });
+  const deleteAll = () => {
+    setTodos([]);
   };
-  render() {
-    const total = this.state.todos.length;
-    const completedCount = this.state.todos.filter(t => t.completed).length;
-    return (
-      <AppWrapper className="App">
-        <Block>
-          <HeaderRow>
-            <LeftCounts>
-              <AllTasks>Всього задач: {total}</AllTasks>
-              <Completed>Виконані задачі: {completedCount}</Completed>
-            </LeftCounts>
-            <Timer />
-          </HeaderRow>
-          <Form onSubmit={(e) => { e.preventDefault(); this.addTodo(); }}>
-            {this.state.loading
-              ? <Skeleton height={50} width="100%" />
-              : (
-                <InputWrapper>
-                  <Input
-                    placeholder="▣   Уведіть завдання яке вам треба"
-                    value={this.state.inputValue}
-                    onChange={this.handleInputChange}
-                  />
-                  <AddButton onClick={this.addTodo} aria-label="Add">+</AddButton>
-                </InputWrapper>
-              )
-            }
-          </Form>
-          <List
-            onDelete={this.deleteTodo}
-            onToggle={this.toggleTodo}
-            onClearAll={this.deleteAll}
-            todos={this.state.todos}
-            loading={this.state.loading}
-          />
-        </Block>
-      </AppWrapper>
-    );
-  }
+
+  // useMemo 1: мемоізувати total і completedCount
+  const { total, completedCount } = useMemo(() => {
+    const completedCount = todos.filter(t => t.completed).length;
+    return {
+      total: todos.length,
+      completedCount
+    };
+  }, [todos]);
+
+  // useMemo 2: мемоізувати відфільтровані todos для List компонента
+  const memoizedTodos = useMemo(() => todos, [todos]);
+
+  return (
+    <AppWrapper className="App">
+      <Block>
+        <HeaderRow>
+          <LeftCounts>
+            <AllTasks>Всього задач: {total}</AllTasks>
+            <Completed>Виконані задачі: {completedCount}</Completed>
+          </LeftCounts>
+          <Timer />
+        </HeaderRow>
+        <Form onSubmit={(e) => { e.preventDefault(); addTodo(); }}>
+          {loading
+            ? <Skeleton height={50} width="100%" />
+            : (
+              <InputWrapper>
+                <Input
+                  placeholder="▣   Уведіть завдання яке вам треба"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                />
+                <AddButton onClick={addTodo} aria-label="Add">+</AddButton>
+              </InputWrapper>
+            )
+          }
+        </Form>
+        <List
+          onDelete={deleteTodo}
+          onToggle={toggleTodo}
+          onClearAll={deleteAll}
+          todos={memoizedTodos}
+          loading={loading}
+        />
+      </Block>
+    </AppWrapper>
+  );
 }
 export default App;
